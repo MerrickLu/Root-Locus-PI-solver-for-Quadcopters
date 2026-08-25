@@ -13,5 +13,5 @@ class OrientationSensor:
     def step_response(self, t=None):
         if t is None:
             t = np.linspace(0, 0.2, 500)
-        t_out, y_out = signal.lfilter(self.tf, T=t)
+        t_out, y_out = signal.step(self.tf, T=t)
         return t_out, y_out
