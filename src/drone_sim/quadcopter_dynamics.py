@@ -98,14 +98,14 @@ class Quadcopter:
         return results
 
 
-def _moment_of_inertia_x_or_y(motor_mass, motor_distance, esc_mass, esc_distance, num_motors=4):
+def moment_of_inertia_x_or_y(motor_mass, motor_distance, esc_mass, esc_distance, num_motors=4):
     """
     Approximates moment of inertia with sum of motor and ESC point masses at their distance from x or y axis.
     """
     return num_motors * motor_mass * motor_distance**2 + \
         num_motors * esc_mass * esc_distance**2
 
-def _moment_of_inertia_z(motor_mass, motor_dx, motor_dy, esc_mass, esc_dx, esc_dy, num_motors=4):
+def moment_of_inertia_z(motor_mass, motor_dx, motor_dy, esc_mass, esc_dx, esc_dy, num_motors=4):
     """
     Approximates moment of inertia with sum of motor and ESC point masses at their distance from z axis.
     """
