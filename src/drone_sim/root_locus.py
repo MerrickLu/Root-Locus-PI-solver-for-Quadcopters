@@ -30,3 +30,58 @@ def _evaluate_tf(tf, s):
     """
     return np.polyval(tf.num, s) / np.polyval(tf.den, s)
 
+def _open_loop_value(open_loop_tfs, s):
+    """
+    Evaluates product of the open loop transfer functions evaluated at s in series connection
+    """
+    val = 1 + 0j
+    for tf in open_loop_tfs:
+        val *= _evaluate_tf(tf, s)
+    return val
+
+def find_pi_gains(open_loop_tfs, overshoot_pct, settling_time):
+    """
+    Searches for P and I gains for controller C(s) = K*(s+b)/s = P + I/s such that
+    the closed loop pole is located at the target closed loop pole (assumes unity
+    feedback).
+
+    Returns (P, I, s_star) where s_star is the target pole
+    """
+    s_star, zeta, wn = target_pole_from_spec(overshoot_pct, settling_time)
+
+    # Angle condition states that the controller's zero location b must be such that
+    # the total angle of C(s*)/K * GH(s*) equals 180 degrees (Alternatively, this is the
+    # sum of the system poles - sum of the sytem zeros)
+    def wrapped_angle_error(b):
+        controller_shape_angle = np.angle((s_star + b) / s_star)
+        total = controller_shape_angle + np.angle(_open_loop_value(open_loop_tfs, s_star))
+        return np.angle(np.exp(1j * (total - np.pi))) # want this expression to be 0
+
+    def find_valid_bracket(func, b_min=1e-4, b_max=1e4, steps=200):
+        """
+        finds a bracket [a, b] where func(a) and func(b) have opposite signs.
+        (for use with brentq later)
+        """
+        b_vals = np.logspace(np.log10(b_min), np.log10(b_max), steps)
+        f_vals = [func(b) for b in b_vals]
+
+        for i in range(len(f_vals) - 1):
+            if f_vals[i] * f_vals[i + 1] <= 0:
+                return b_vals[i], b_vals[i + 1]
+
+        raise ValueError("Could not find a valid root locus zero b in the search range. "
+                         "The target target pole s* may be unachievable with a PI controller.")
+
+    b_low, b_high = find_valid_bracket(wrapped_angle_error)
+    b = brentq(wrapped_angle_error, b_low, b_high)
+
+    # Magnitude condition states that the abs value of open loop tfs multiplied by K must
+    # equal 1
+    controller_shape_mag = abs((s_star + b) / s_star)
+    K = 1 / (controller_shape_mag * abs(_open_loop_value(open_loop_tfs, s_star)))
+
+    P = K
+    I = K * b
+    return P, I, s_star
+
+
