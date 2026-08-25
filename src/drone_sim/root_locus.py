@@ -84,4 +84,60 @@ def find_pi_gains(open_loop_tfs, overshoot_pct, settling_time):
     I = K * b
     return P, I, s_star
 
+def verify_dominant_pole(P, I, open_loop_tfs, s_star, min_separation_ratio = 3.0):
+    """
+    Closes loop with P, I gains found and checks whether target pole s_star is the dominant
+    one. Does this by checking whether every other closed-loop pole decays faster by at least
+    min_separation_ratio
+
+    Returns a dict with closed-loop poles, whether s_star is dominant, and the overshoot and
+    settling time
+    """
+    C_ctl = control.tf([P, I], [1, 0])
+    open_loop_ctl = control.tf(open_loop_tfs[0].num, open_loop_tfs[0].den)
+    for tf in open_loop_tfs[1:]:
+        open_loop_ctl += control.tf(control.series(C_ctl, open_loop_ctl), 1)
+
+    closed_loop = control.feedback(control.series(C_ctl, open_loop_ctl))
+    poles = closed_loop.poles()
+
+    target_real = s_star.real
+    other_poles = [p for p in poles if not np.isclose(p, s_star, atol = 1e-2)
+                   and not np.isclose(p, s_star.conjugate(), atol = 1e-2)]
+    worst_ratio = min(abs(p.real) / abs(target_real) for p in other_poles) if other_poles else np.inf
+    dominant = worst_ratio >= min_separation_ratio
+
+    t = np.linspace(0, 10 / abs(target_real), 5000)
+    t_out, y_out = control.step_response(closed_loop, T=t)
+    final = y_out[-1]
+    overshoot_actual = (np.max(y_out) - final) / final * 100
+    band = 0.02 * final
+    outside = np.where(np.abs(y_out - final) > band)[0]
+    settle_actual = t_out[outside[-1]] if len(outside) else 0.0
+
+    return {
+        "poles": poles,
+        "other_poles": other_poles,
+        "worst_separation_ratio": worst_ratio,
+        "dominant_pole_assumption_holds": dominant,
+        "overshoot_actual_pct": overshoot_actual,
+        "settling_time_actual": settle_actual,
+    }
+
+def step_response(open_loop_tfs, P, I, T):
+    C_ctl = control.tf([P, I], [1, 0])
+    open_loop_ctl = control.tf(open_loop_tfs[0].num, open_loop_tfs[0].den)
+    for tf in open_loop_tfs[1:]:
+        open_loop_ctl = control.series(open_loop_ctl, control.tf(tf.num, tf.den))
+    closed_loop = control.feedback(control.series(C_ctl, open_loop_ctl), 1)
+    t_out, y_out = control.step_response(closed_loop, T=T)
+
+    plt.plot(t_out, y_out)
+    plt.xlabel("Time (s)")
+    plt.ylabel("Output")
+    plt.title("PI Controller step response")
+    plt.grid(True)
+    plt.show()
+
+
 
