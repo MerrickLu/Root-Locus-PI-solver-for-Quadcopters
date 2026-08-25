@@ -96,7 +96,7 @@ def verify_dominant_pole(P, I, open_loop_tfs, s_star, min_separation_ratio = 3.0
     C_ctl = control.tf([P, I], [1, 0])
     open_loop_ctl = control.tf(open_loop_tfs[0].num, open_loop_tfs[0].den)
     for tf in open_loop_tfs[1:]:
-        open_loop_ctl += control.tf(control.series(C_ctl, open_loop_ctl), 1)
+        open_loop_ctl = control.series(open_loop_ctl, control.tf(tf.num, tf.den))
 
     closed_loop = control.feedback(control.series(C_ctl, open_loop_ctl))
     poles = closed_loop.poles()
