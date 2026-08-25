@@ -131,13 +131,8 @@ def step_response(open_loop_tfs, P, I, T):
         open_loop_ctl = control.series(open_loop_ctl, control.tf(tf.num, tf.den))
     closed_loop = control.feedback(control.series(C_ctl, open_loop_ctl), 1)
     t_out, y_out = control.step_response(closed_loop, T=T)
+    return t_out, y_out
 
-    plt.plot(t_out, y_out)
-    plt.xlabel("Time (s)")
-    plt.ylabel("Output")
-    plt.title("PI Controller step response")
-    plt.grid(True)
-    plt.show()
 
 
 
