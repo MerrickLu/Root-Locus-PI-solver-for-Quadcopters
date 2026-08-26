@@ -31,14 +31,6 @@ Numbers are based on motor and airframe specs from Carbon Aeronautics quadcopter
   the found gains and checks whether the target pole is dominant.
 - **`main.py`**: prints a summary per axis (roll/pitch/yaw), plots the closed-loop step responses.
 
-## Example Output
-`main.py` plots the closed-loop step response for all three axes:
-
-<img width="1000" height="500" alt="Figure_1" src="https://github.com/user-attachments/assets/907705eb-81d8-49ee-8444-4ae1bb165b4c" />
-
-*Roll, pitch, and yaw traces overlap because there's no cross
-coupling between axes or asymmetry yet, so the SISO solutions overlap.*
-
 ## root_locus.py
 Overshoot % and settling time are converted into a target closed-loop pole
 using the standard relations:
@@ -50,6 +42,38 @@ using the standard relations:
 `find_pi_gains()` then solves for a controller C(s) = K(s+b)/s that
 places a closed-loop pole at s*, using the two root-locus
 conditions.
+
+## Example Output
+`main.py` plots the closed-loop step response for all three axes:
+
+<img width="1000" height="500" alt="Figure_1" src="https://github.com/user-attachments/assets/907705eb-81d8-49ee-8444-4ae1bb165b4c" />
+
+*Roll, pitch, and yaw traces overlap because there's no cross
+coupling between axes or asymmetry yet, so the SISO solutions overlap.*
+
+<details>
+<summary>Console output (Roll axis; Pitch/Yaw are identical in this run)</summary>
+
+```text
+============================================================
+ ROLL DYNAMICS
+============================================================
+Closed-loop poles : [-71.26603877 +0.j          -7.82404601+10.67494337j
+  -7.82404601-10.67494337j  -9.25105562 +0.j        ]
+Dominant Pole Hold: False (Ratio: 1.18x | Min: 3.00x)
+------------------------------------------------------------
+Target Specs      : 10.0% overshoot | 0.500s settling
+Actual Response   : 42.2% overshoot | 0.477s settling
+============================================================
+```
+</details>
+
+`Dominant Pole Hold: False` here means the target pole pair's real part
+is only ~1.18x closer to the imaginary axis than the nearest other pole 
+(Ideally should be more than 3x). This means the dominant-pole
+approximation breaks down (see Limitations below) and we can see the
+actual overshoot (42.2%) overshoots the 10% target by a wide margin because
+the other closed loop poles aren't negligible. 
 
 - **Angle condition** states the sum of angles from open-loop poles to s*, minus
   angles from open-loop zeros to s*, must equal 180°. 
