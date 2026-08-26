@@ -18,7 +18,7 @@ def print_axis_summary(name: str, result: dict) -> None:
           f"(Ratio: {result['worst_separation_ratio']:.2f}x | Min: 3.00x)")
     print("-" * 60)
     print(f"Target Specs      : 10.0% overshoot | 0.500s settling")
-    print(f"Actual Response   : {result['overshoot_actual_pct']:.1f}% overshoot | "
+    print(f"Response   : {result['overshoot_actual_pct']:.1f}% overshoot | "
           f"{result['settling_time_actual']:.3f}s settling")
 
 # system Setup
@@ -37,7 +37,7 @@ axes_tf = {
 }
 
 # processing and plotting Setup
-t = np.linspace(0, 3, 5000)
+t = np.linspace(0, 1.5, 5000)
 plt.figure(figsize=(10, 5))
 
 for name, axis_tf in axes_tf.items():
