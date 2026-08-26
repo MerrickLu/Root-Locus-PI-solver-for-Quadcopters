@@ -2,7 +2,7 @@
 A Python tool designed to analyze quadcopter pitch/roll/yaw dynamics and automatically solve for Proportional-Integral (PI) gain parameters 
 given a overshoot percentage and settling time using Root Locus analysis
 
-> Still in progress, transfer function modelling and pole placement logic complete. No derivative term. UI and gain visualization still underway.
+> Still in progress, transfer function modelling and pole placement logic are complete. Still need a derivative term, and UI and gain visualization.
 
 ## Overview
 This is an automated PI gain selection tool to achieve desired damping ratio and settling time for quadcopter rate loops. I built this to learn Python and the 
