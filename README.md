@@ -52,7 +52,7 @@ conditions.
 coupling between axes or asymmetry yet, so the SISO solutions overlap.*
 
 <details>
-<summary>Console output (Roll axis; Pitch/Yaw are identical in this run)</summary>
+<summary>Console output (Roll axis)</summary>
 
 ```text
 ============================================================
@@ -66,6 +66,7 @@ Target Specs      : 10.0% overshoot | 0.500s settling
 Actual Response   : 42.2% overshoot | 0.477s settling
 ============================================================
 ```
+
 </details>
 
 `Dominant Pole Hold: False` here means the target pole pair's real part
