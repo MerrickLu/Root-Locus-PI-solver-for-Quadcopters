@@ -31,6 +31,14 @@ Numbers are based on motor and airframe specs from Carbon Aeronautics quadcopter
   the found gains and checks whether the target pole is dominant.
 - **`main.py`**: prints a summary per axis (roll/pitch/yaw), plots the closed-loop step responses.
 
+## Example Output
+`main.py` plots the closed-loop step response for all three axes:
+
+<img width="1000" height="500" alt="Figure_1" src="https://github.com/user-attachments/assets/907705eb-81d8-49ee-8444-4ae1bb165b4c" />
+
+*Roll, pitch, and yaw traces overlap because there's no cross
+coupling between axes or asymmetry yet, so the SISO solutions overlap.*
+
 ## root_locus.py
 Overshoot % and settling time are converted into a target closed-loop pole
 using the standard relations:
