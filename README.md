@@ -63,7 +63,7 @@ Closed-loop poles : [-71.26603877 +0.j          -7.82404601+10.67494337j
 Dominant Pole Hold: False (Ratio: 1.18x | Min: 3.00x)
 ------------------------------------------------------------
 Target Specs      : 10.0% overshoot | 0.500s settling
-Actual Response   : 42.2% overshoot | 0.477s settling
+Response   : 42.2% overshoot | 0.477s settling
 ============================================================
 ```
 
