@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 import quadcopter_dynamics as qd
 import root_locus as rl
 
-def print_axis_summary(name: str, result: dict) -> None:
+def print_axis_summary(name: str, result: dict, P, I, s_star) -> None:
     """
     print a summary for an axis dynamic verification
     """
@@ -13,6 +13,7 @@ def print_axis_summary(name: str, result: dict) -> None:
     print(f"\n{divider}")
     print(f" {name.upper()} DYNAMICS")
     print(divider)
+    print(f"P: {P:.3f} | I: {I:.3f} | s*: {s_star:.3f}")
     print(f"Closed-loop poles : {result['poles']}")
     print(f"Dominant Pole Hold: {result['dominant_pole_assumption_holds']} "
           f"(Ratio: {result['worst_separation_ratio']:.2f}x | Min: 3.00x)")
@@ -49,7 +50,7 @@ for name, axis_tf in axes_tf.items():
     # verify dominant pole assumptions
     system_tfs = [motor.tf, axis_tf, sensor.tf]
     result = rl.verify_dominant_pole(P, I, system_tfs, s_star)
-    print_axis_summary(name, result)
+    print_axis_summary(name, result, P, I, s_star)
 
     # Compute step response and plot
     t_out, y_out = rl.step_response(system_tfs, P, I, t)
